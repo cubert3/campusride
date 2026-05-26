@@ -1,60 +1,53 @@
 "use client";
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle } from "lucide-react";
 
-export default function PaymentPage() {
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, CheckCircle, CreditCard, ShieldCheck } from "lucide-react";
+
+function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const amount = searchParams.get("amount") || "40";
   const driver = searchParams.get("driver") || "Driver";
   const [step, setStep] = useState<"pay" | "processing" | "done">("pay");
+  const [txnId, setTxnId] = useState("");
 
   function handlePay() {
     setStep("processing");
-    setTimeout(() => setStep("done"), 2000);
+    setTimeout(() => {
+      setTxnId(`CR${Date.now().toString().slice(-8)}`);
+      setStep("done");
+    }, 1200);
   }
 
   if (step === "processing") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mb-6" />
-        <p className="text-gray-600 font-medium">Processing payment...</p>
-        <p className="text-xs text-gray-400 mt-1">Contacting UPI</p>
+      <div className="map-grid flex min-h-screen items-center justify-center p-6 text-center">
+        <div>
+          <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-white border-t-transparent" />
+          <p className="font-semibold text-white">Processing UPI</p>
+          <p className="mt-1 text-sm text-white/45">Sending fuel share directly to {driver}</p>
+        </div>
       </div>
     );
   }
 
   if (step === "done") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <div className="bg-green-50 rounded-2xl p-8 text-center w-full max-w-sm">
-          <CheckCircle size={56} className="text-green-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-1">Payment sent!</h2>
-          <p className="text-sm text-gray-500 mb-2">₹{amount} sent to {driver}</p>
-          <p className="text-xs text-gray-400 mb-6">via UPI · {new Date().toLocaleTimeString()}</p>
-          <div className="bg-white rounded-xl p-4 border border-green-100 mb-6 text-left">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-500">Amount</span>
-              <span className="font-semibold text-gray-900">₹{amount}</span>
-            </div>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-500">To</span>
-              <span className="font-semibold text-gray-900">{driver}</span>
-            </div>
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-gray-500">Status</span>
-              <span className="font-semibold text-green-600">Success</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Txn ID</span>
-              <span className="font-mono text-xs text-gray-400">CR{Date.now().toString().slice(-8)}</span>
-            </div>
+      <div className="map-grid flex min-h-screen items-end p-4">
+        <div className="glass-panel w-full rounded-[34px] p-5 text-center">
+          <CheckCircle size={62} className="mx-auto mb-4 text-emerald-300" />
+          <h2 className="text-3xl font-semibold tracking-tight">Payment sent</h2>
+          <p className="mt-2 text-sm text-white/50">
+            Rs {amount} was sent to {driver}
+          </p>
+          <div className="my-6 space-y-3 rounded-[28px] bg-white/[0.06] p-4 text-left">
+            <Row label="Amount" value={`Rs ${amount}`} />
+            <Row label="To" value={driver} />
+            <Row label="Status" value="Success" />
+            <Row label="Txn ID" value={txnId} />
           </div>
-          <button
-            onClick={() => router.push("/home")}
-            className="w-full bg-purple-600 text-white rounded-xl py-3 font-medium"
-          >
+          <button onClick={() => router.push("/home")} className="w-full rounded-full bg-white py-4 font-bold text-black">
             Back to home
           </button>
         </div>
@@ -63,44 +56,75 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="p-4 flex flex-col min-h-screen">
-      <button onClick={() => router.back()} className="text-gray-400 text-sm mb-6 pt-2 text-left">
-        ← Back
+    <div className="min-h-screen p-4">
+      <button onClick={() => router.back()} className="mt-2 flex h-11 w-11 items-center justify-center rounded-full bg-white/[0.08] text-white">
+        <ArrowLeft size={18} />
       </button>
 
-      <h1 className="text-xl font-semibold text-gray-900 mb-1">Pay fuel share</h1>
-      <p className="text-sm text-gray-500 mb-8">Split the cost directly with your driver</p>
-
-      <div className="bg-gray-50 rounded-2xl p-6 text-center mb-6">
-        <p className="text-sm text-gray-500 mb-1">Paying to</p>
-        <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 text-xl font-bold mx-auto mb-2">
-          {driver[0]}
+      <section className="relative mt-5 overflow-hidden rounded-[34px] bg-[#111] p-5">
+        <p className="absolute -left-1 top-12 text-7xl font-black tracking-tight text-white/[0.04]">UPI</p>
+        <div className="relative z-10">
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-white/45">Paying to</p>
+              <h1 className="text-3xl font-semibold tracking-tight">{driver}</h1>
+            </div>
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-xl font-black text-black">
+              {driver[0]}
+            </div>
+          </div>
+          <p className="text-sm text-white/45">Fuel share</p>
+          <p className="text-6xl font-semibold tracking-tight">Rs {amount}</p>
+          <p className="mt-4 flex items-center gap-2 text-sm text-emerald-300">
+            <ShieldCheck size={16} />
+            Direct student-to-student payment
+          </p>
         </div>
-        <p className="font-semibold text-gray-900">{driver}</p>
-        <p className="text-xs text-gray-400 mb-4">Verified student · RV College</p>
-        <p className="text-4xl font-bold text-gray-900">₹{amount}</p>
-        <p className="text-xs text-gray-400 mt-1">fuel share</p>
-      </div>
+      </section>
 
-      <div className="bg-white border border-gray-100 rounded-2xl p-4 mb-6">
-        <p className="text-xs font-medium text-gray-500 mb-3">Pay via UPI</p>
+      <section className="mt-4 glass-panel rounded-[30px] p-4">
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-white/40">Choose UPI app</p>
         <div className="space-y-2">
-          {["Google Pay", "PhonePe", "Paytm", "BHIM UPI"].map(app => (
+          {["Google Pay", "PhonePe", "Paytm", "BHIM UPI"].map((app) => (
             <button
               key={app}
               onClick={handlePay}
-              className="w-full flex items-center justify-between px-4 py-3 border border-gray-100 rounded-xl hover:bg-gray-50 active:scale-95 transition-transform"
+              className="flex w-full items-center justify-between rounded-full bg-white/[0.07] px-4 py-4 text-left"
             >
-              <span className="text-sm font-medium text-gray-700">{app}</span>
-              <span className="text-xs text-purple-600 font-medium">Pay ₹{amount} →</span>
+              <span className="flex items-center gap-3 text-sm font-semibold text-white">
+                <CreditCard size={17} className="text-white/55" />
+                {app}
+              </span>
+              <span className="text-xs font-bold text-white/45">Rs {amount}</span>
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      <p className="text-xs text-center text-gray-400">
-        Payments go directly to driver · CampusRide charges no fee
-      </p>
+      <p className="mt-4 text-center text-xs text-white/35">CampusRide charges no fee and never holds payment.</p>
     </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between gap-4 border-b border-white/10 pb-3 last:border-0 last:pb-0">
+      <span className="text-sm text-white/40">{label}</span>
+      <span className="text-right text-sm font-semibold text-white">{value}</span>
+    </div>
+  );
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-black">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-white border-t-transparent" />
+        </div>
+      }
+    >
+      <PaymentContent />
+    </Suspense>
   );
 }

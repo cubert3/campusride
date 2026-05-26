@@ -1,10 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/context/AppContext";
 import BottomNav from "@/components/shared/BottomNav";
-
-const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CampusRide",
@@ -14,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#050505",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -22,10 +19,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={geist.variable}>
-      <body className="min-h-screen bg-gray-50 font-sans" suppressHydrationWarning>
+    <html lang="en">
+      <body className="min-h-screen bg-black font-sans" suppressHydrationWarning>
         <AppProvider>
-          <main className="max-w-md mx-auto bg-white min-h-screen pb-20">
+          <main className="phone-surface mx-auto min-h-screen max-w-md overflow-hidden pb-20 text-white shadow-2xl">
             {children}
           </main>
           <BottomNav />
