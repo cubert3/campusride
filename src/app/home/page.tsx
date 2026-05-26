@@ -2,169 +2,125 @@
 
 import { useApp } from "@/context/AppContext";
 import { useRouter } from "next/navigation";
-import { Bike, Briefcase, Car, ChevronRight, Home, Leaf, MapPin, Navigation, ShieldCheck, UserRound } from "lucide-react";
+import { Bike, Car, Leaf, MapPin, Search, ShieldCheck, Users } from "lucide-react";
 
 export default function HomePage() {
-  const { user, rides, bookings } = useApp();
+  const { user, rides, bookings, colleges, selectedCollege, setSelectedCollegeId } = useApp();
   const router = useRouter();
   const openRides = rides.filter((ride) => ride.availableSeats > 0);
-  const bestRide = openRides[0];
-  const co2 = (rides.length * 2.1).toFixed(1);
+  const co2Saved = (bookings.length * 2.1 + rides.length * 0.4).toFixed(1);
 
   return (
-    <div className="relative min-h-screen">
-      <section className="map-grid relative h-[46vh] min-h-[340px] overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,transparent_0_42px,rgb(0_0_0_/_0.2)_43px),linear-gradient(180deg,rgb(0_0_0_/_0.1),#090909_96%)]" />
-
-        <div className="absolute left-5 right-5 top-5 z-10 flex items-center justify-between">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70">
-            <UserRound size={18} />
+    <div className="space-y-5 p-4">
+      <header className="rounded-3xl bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm text-slate-500">Good morning</p>
+            <h1 className="text-2xl font-bold text-slate-950">{user.name}</h1>
+            <p className="text-xs text-slate-500">{user.department} / Year {user.year}</p>
           </div>
-          <div className="rounded-full bg-black/80 px-4 py-2 text-sm font-bold text-white shadow-2xl">
-            CampusRide
-          </div>
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70">
-            <ShieldCheck size={18} />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100 text-lg font-bold text-indigo-700">
+            {user.name[0]}
           </div>
         </div>
 
-        <div className="absolute left-1/2 top-[33%] z-10 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full border-[7px] border-white bg-black shadow-[0_0_0_10px_rgb(255_255_255_/_0.08)]" />
-        <div className="absolute left-[22%] top-[63%] h-7 w-16 -rotate-6 rounded-full car-sedan" />
-        <div className="absolute right-[20%] top-[50%] h-7 w-16 rotate-90 rounded-full car-suv" />
-        <div className="absolute left-[48%] top-[58%] h-1 w-24 rotate-[28deg] rounded-full bg-white/15" />
-
-        <button
-          onClick={() => router.push("/map")}
-          className="absolute right-5 top-24 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white shadow-2xl"
+        <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          College
+        </label>
+        <select
+          value={selectedCollege.id}
+          onChange={(event) => setSelectedCollegeId(event.target.value)}
+          className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-900 outline-none focus:border-indigo-500"
         >
-          <Navigation size={18} />
-        </button>
+          {colleges.map((college) => (
+            <option key={college.id} value={college.id}>
+              {college.shortName} - {college.name}
+            </option>
+          ))}
+        </select>
+      </header>
 
-        <div className="absolute bottom-12 left-5 right-5 z-10">
-          <div className="mb-3 flex gap-2">
-            <Chip icon={<Home size={14} />} label="Home" />
-            <Chip icon={<Briefcase size={14} />} label="College" />
-          </div>
-          <button
-            onClick={() => router.push("/find")}
-            className="glass-panel flex w-full items-center gap-3 rounded-[26px] p-4 text-left"
-          >
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 text-white">
-              <MapPin size={19} fill="currentColor" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs text-white/45">Where to?</p>
-              <p className="truncate text-sm font-semibold text-white">RV College of Engineering</p>
-            </div>
-            <ChevronRight size={18} className="text-white/50" />
-          </button>
+      <section className="rounded-3xl bg-indigo-600 p-5 text-white shadow-sm">
+        <div className="mb-4 flex items-center gap-2 text-sm font-medium text-indigo-100">
+          <ShieldCheck size={18} />
+          Verified student-only rides
         </div>
+        <h2 className="text-3xl font-bold leading-tight">Share daily commutes to {selectedCollege.shortName}</h2>
+        <p className="mt-3 text-sm leading-6 text-indigo-100">
+          Students with bikes or cars offer seats. Riders split fuel directly through UPI.
+        </p>
       </section>
 
-      <section className="-mt-7 space-y-4 px-4 pb-4">
-        <div className="glass-panel relative z-20 rounded-[30px] p-4">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-white/50">Good morning, {user.name}</p>
-              <h1 className="text-2xl font-semibold tracking-tight text-white">Choose your commute</h1>
-            </div>
-            <div className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-300">
-              {openRides.length} live
-            </div>
-          </div>
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => router.push("/find")}
+          className="rounded-3xl bg-slate-950 p-4 text-left text-white shadow-sm active:scale-[0.98]"
+        >
+          <Search size={24} />
+          <span className="mt-5 block text-base font-bold">Find a ride</span>
+          <span className="text-xs text-slate-300">{openRides.length} available</span>
+        </button>
+        <button
+          onClick={() => router.push("/offer")}
+          className="rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm active:scale-[0.98]"
+        >
+          <Car size={24} className="text-indigo-600" />
+          <span className="mt-5 block text-base font-bold text-slate-950">Offer a ride</span>
+          <span className="text-xs text-slate-500">Add your commute</span>
+        </button>
+      </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <RideClass
-              title="Bike pool"
-              time="2 min"
-              price={`Rs ${Math.max(25, (bestRide?.fuelShare || 35) - 10)}`}
-              active
-              icon={<Bike size={17} />}
-              visual="sedan"
-              onClick={() => router.push("/find")}
-            />
-            <RideClass
-              title="Car pool"
-              time="5 min"
-              price={`Rs ${bestRide?.fuelShare || 40}`}
-              icon={<Car size={17} />}
-              visual="suv"
-              onClick={() => router.push("/find")}
-            />
-          </div>
+      <div className="grid grid-cols-3 gap-3">
+        <Metric icon={<Car size={18} />} value={`${openRides.length}`} label="open rides" />
+        <Metric icon={<Users size={18} />} value={`${bookings.length}`} label="booked" />
+        <Metric icon={<Leaf size={18} />} value={co2Saved} label="kg CO2" />
+      </div>
 
-          <button
-            onClick={() => router.push("/find")}
-            className="mt-4 w-full rounded-full bg-white py-4 text-base font-bold text-black active:scale-[0.99]"
-          >
-            Continue
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-bold text-slate-900">Nearby rides</h2>
+          <button onClick={() => router.push("/map")} className="text-sm font-semibold text-indigo-700">
+            Map
           </button>
         </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          <Metric icon={<ShieldCheck size={16} />} value="Verified" label="students" />
-          <Metric icon={<Leaf size={16} />} value={co2} label="kg CO2" />
-          <Metric icon={<Car size={16} />} value={`${bookings.length}`} label="bookings" />
+        <div className="space-y-3">
+          {openRides.slice(0, 3).map((ride) => {
+            const Vehicle = ride.vehicleType === "car" ? Car : Bike;
+            return (
+              <button
+                key={ride.id}
+                onClick={() => router.push("/find")}
+                className="flex w-full items-center justify-between rounded-3xl border border-slate-200 bg-white p-4 text-left shadow-sm"
+              >
+                <div className="min-w-0">
+                  <p className="flex items-center gap-2 font-semibold text-slate-950">
+                    <Vehicle size={16} className="text-indigo-600" />
+                    {ride.from} to {ride.to}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1 text-xs text-slate-500">
+                    <MapPin size={12} />
+                    {ride.driverName} / {ride.departureTime}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-indigo-700">Rs {ride.fuelShare}</p>
+                  <p className="text-xs text-slate-400">{ride.availableSeats} seats</p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </section>
     </div>
   );
 }
 
-function Chip({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <span className="flex items-center gap-2 rounded-full bg-black/75 px-4 py-2 text-xs font-semibold text-white">
-      {icon}
-      {label}
-    </span>
-  );
-}
-
-function RideClass({
-  title,
-  time,
-  price,
-  active,
-  icon,
-  visual,
-  onClick,
-}: {
-  title: string;
-  time: string;
-  price: string;
-  active?: boolean;
-  icon: React.ReactNode;
-  visual: "sedan" | "suv";
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`relative overflow-hidden rounded-[24px] p-4 text-left transition active:scale-[0.98] ${
-        active ? "bg-emerald-500/20 ring-1 ring-emerald-300/30" : "bg-white/[0.07] ring-1 ring-white/10"
-      }`}
-    >
-      <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2 text-sm font-semibold text-white">
-          {icon}
-          {title}
-        </span>
-        <span className="rounded-full bg-emerald-400/20 px-2 py-1 text-[11px] font-bold text-emerald-300">{price}</span>
-      </div>
-      <p className="mt-1 text-xs text-white/45">{time}</p>
-      <div className="mt-4 flex justify-center">
-        <div className={`h-14 w-32 ${visual === "sedan" ? "car-sedan" : "car-suv"}`} />
-      </div>
-    </button>
-  );
-}
-
 function Metric({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
   return (
-    <div className="soft-panel rounded-[22px] p-3 text-center">
-      <div className="mx-auto mb-2 flex justify-center text-white/70">{icon}</div>
-      <p className="text-sm font-bold text-white">{value}</p>
-      <p className="text-[11px] text-white/40">{label}</p>
+    <div className="rounded-3xl border border-slate-200 bg-white p-3 text-center shadow-sm">
+      <div className="mx-auto mb-1 flex justify-center text-indigo-600">{icon}</div>
+      <p className="text-lg font-bold text-slate-950">{value}</p>
+      <p className="text-xs text-slate-500">{label}</p>
     </div>
   );
 }

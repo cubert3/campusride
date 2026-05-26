@@ -39,3 +39,11 @@ export interface Booking {
   status: "pending" | "confirmed" | "completed";
   createdAt: string;
 }
+
+export interface College {
+  id: string;
+  shortName: string;
+  name: string;
+  lat: number;
+  lng: number;
+}

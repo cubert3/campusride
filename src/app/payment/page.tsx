@@ -22,32 +22,28 @@ function PaymentContent() {
 
   if (step === "processing") {
     return (
-      <div className="map-grid flex min-h-screen items-center justify-center p-6 text-center">
-        <div>
-          <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-white border-t-transparent" />
-          <p className="font-semibold text-white">Processing UPI</p>
-          <p className="mt-1 text-sm text-white/45">Sending fuel share directly to {driver}</p>
-        </div>
+      <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
+        <div className="mb-6 h-16 w-16 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+        <p className="font-bold text-slate-950">Processing UPI payment</p>
+        <p className="mt-1 text-sm text-slate-500">Sending fuel share to {driver}</p>
       </div>
     );
   }
 
   if (step === "done") {
     return (
-      <div className="map-grid flex min-h-screen items-end p-4">
-        <div className="glass-panel w-full rounded-[34px] p-5 text-center">
-          <CheckCircle size={62} className="mx-auto mb-4 text-emerald-300" />
-          <h2 className="text-3xl font-semibold tracking-tight">Payment sent</h2>
-          <p className="mt-2 text-sm text-white/50">
-            Rs {amount} was sent to {driver}
-          </p>
-          <div className="my-6 space-y-3 rounded-[28px] bg-white/[0.06] p-4 text-left">
+      <div className="flex min-h-screen items-center p-4">
+        <div className="w-full rounded-3xl bg-white p-6 text-center shadow-sm">
+          <CheckCircle size={58} className="mx-auto mb-4 text-emerald-600" />
+          <h1 className="text-2xl font-bold text-slate-950">Payment sent</h1>
+          <p className="mt-2 text-sm text-slate-500">Rs {amount} sent to {driver}</p>
+          <div className="my-6 space-y-3 rounded-3xl bg-slate-50 p-4 text-left">
             <Row label="Amount" value={`Rs ${amount}`} />
             <Row label="To" value={driver} />
             <Row label="Status" value="Success" />
             <Row label="Txn ID" value={txnId} />
           </div>
-          <button onClick={() => router.push("/home")} className="w-full rounded-full bg-white py-4 font-bold text-black">
+          <button onClick={() => router.push("/home")} className="w-full rounded-2xl bg-indigo-600 py-3 font-bold text-white">
             Back to home
           </button>
         </div>
@@ -56,61 +52,60 @@ function PaymentContent() {
   }
 
   return (
-    <div className="min-h-screen p-4">
-      <button onClick={() => router.back()} className="mt-2 flex h-11 w-11 items-center justify-center rounded-full bg-white/[0.08] text-white">
-        <ArrowLeft size={18} />
+    <div className="space-y-4 p-4">
+      <button onClick={() => router.back()} className="flex items-center gap-2 text-sm font-semibold text-slate-500">
+        <ArrowLeft size={16} />
+        Back
       </button>
 
-      <section className="relative mt-5 overflow-hidden rounded-[34px] bg-[#111] p-5">
-        <p className="absolute -left-1 top-12 text-7xl font-black tracking-tight text-white/[0.04]">UPI</p>
-        <div className="relative z-10">
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-white/45">Paying to</p>
-              <h1 className="text-3xl font-semibold tracking-tight">{driver}</h1>
-            </div>
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-xl font-black text-black">
-              {driver[0]}
-            </div>
+      <section className="rounded-3xl bg-white p-5 shadow-sm">
+        <p className="text-sm text-slate-500">Paying to</p>
+        <div className="mt-2 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-950">{driver}</h1>
+            <p className="mt-1 flex items-center gap-1 text-sm text-emerald-700">
+              <ShieldCheck size={15} />
+              Verified student
+            </p>
           </div>
-          <p className="text-sm text-white/45">Fuel share</p>
-          <p className="text-6xl font-semibold tracking-tight">Rs {amount}</p>
-          <p className="mt-4 flex items-center gap-2 text-sm text-emerald-300">
-            <ShieldCheck size={16} />
-            Direct student-to-student payment
-          </p>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-xl font-bold text-indigo-700">
+            {driver[0]}
+          </div>
+        </div>
+        <div className="mt-6 rounded-3xl bg-indigo-50 p-5 text-center">
+          <p className="text-sm text-indigo-700">Fuel share</p>
+          <p className="mt-1 text-5xl font-black text-slate-950">Rs {amount}</p>
         </div>
       </section>
 
-      <section className="mt-4 glass-panel rounded-[30px] p-4">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-white/40">Choose UPI app</p>
+      <section className="rounded-3xl bg-white p-4 shadow-sm">
+        <p className="mb-3 text-xs font-bold uppercase tracking-wide text-slate-500">Choose UPI app</p>
         <div className="space-y-2">
           {["Google Pay", "PhonePe", "Paytm", "BHIM UPI"].map((app) => (
             <button
               key={app}
               onClick={handlePay}
-              className="flex w-full items-center justify-between rounded-full bg-white/[0.07] px-4 py-4 text-left"
+              className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left"
             >
-              <span className="flex items-center gap-3 text-sm font-semibold text-white">
-                <CreditCard size={17} className="text-white/55" />
+              <span className="flex items-center gap-3 font-semibold text-slate-900">
+                <CreditCard size={17} className="text-indigo-600" />
                 {app}
               </span>
-              <span className="text-xs font-bold text-white/45">Rs {amount}</span>
+              <span className="text-sm font-bold text-indigo-700">Pay</span>
             </button>
           ))}
         </div>
       </section>
-
-      <p className="mt-4 text-center text-xs text-white/35">CampusRide charges no fee and never holds payment.</p>
+      <p className="text-center text-xs text-slate-500">CampusRide charges no fee. Payment goes directly to the driver.</p>
     </div>
   );
 }
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-4 border-b border-white/10 pb-3 last:border-0 last:pb-0">
-      <span className="text-sm text-white/40">{label}</span>
-      <span className="text-right text-sm font-semibold text-white">{value}</span>
+    <div className="flex justify-between gap-4 border-b border-slate-200 pb-3 last:border-0 last:pb-0">
+      <span className="text-sm text-slate-500">{label}</span>
+      <span className="text-right text-sm font-bold text-slate-950">{value}</span>
     </div>
   );
 }
@@ -119,8 +114,8 @@ export default function PaymentPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-black">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-white border-t-transparent" />
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
         </div>
       }
     >

@@ -1,91 +1,95 @@
 "use client";
 
 import { useApp } from "@/context/AppContext";
+import { Bike, Car, Clock, MapPin, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Bike, Car, Clock, Navigation, Users, X } from "lucide-react";
 import { useState } from "react";
 
 export default function MapPage() {
-  const { rides } = useApp();
+  const { rides, selectedCollege } = useApp();
   const router = useRouter();
-  const [selected, setSelected] = useState<string | null>(rides[0]?.id ?? null);
-  const selectedRide = rides.find((ride) => ride.id === selected);
+  const [selected, setSelected] = useState(rides[0]?.id ?? "");
+  const selectedRide = rides.find((ride) => ride.id === selected) || rides[0];
 
   return (
-    <div className="map-grid relative min-h-[calc(100vh-64px)] overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,transparent_0_44px,rgb(0_0_0_/_0.22)_45px),linear-gradient(180deg,rgb(0_0_0_/_0.05),#050505_94%)]" />
-
-      <header className="absolute left-5 right-5 top-5 z-10 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-white/45">Live map</p>
-          <h1 className="text-2xl font-semibold tracking-tight">Campus routes</h1>
-        </div>
-        <button className="flex h-12 w-12 items-center justify-center rounded-full bg-black/80 text-white">
-          <Navigation size={18} />
-        </button>
+    <div className="space-y-4 p-4">
+      <header>
+        <p className="text-sm text-slate-500">Route map</p>
+        <h1 className="text-2xl font-bold text-slate-950">Rides to {selectedCollege.shortName}</h1>
       </header>
 
-      <div className="absolute left-1/2 top-[34%] z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border-[8px] border-white bg-black shadow-[0_0_0_12px_rgb(255_255_255_/_0.08)]" />
-      <div className="absolute left-[22%] top-[56%] h-7 w-16 -rotate-6 rounded-full car-sedan" />
-      <div className="absolute right-[22%] top-[43%] h-7 w-16 rotate-90 rounded-full car-suv" />
-
-      {rides.map((ride, index) => (
-        <button
-          key={ride.id}
-          onClick={() => setSelected(ride.id)}
-          className="absolute z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white text-sm font-black text-black shadow-2xl"
-          style={{
-            left: `${22 + (index % 3) * 24}%`,
-            top: `${28 + index * 8}%`,
-          }}
-        >
-          {ride.driverName[0]}
-        </button>
-      ))}
-
-      <div className="absolute left-4 top-24 z-10 rounded-full bg-black/80 px-4 py-2 text-xs font-bold text-emerald-300">
-        Route matched {rides.length} rides
-      </div>
+      <section className="relative h-72 overflow-hidden rounded-3xl bg-indigo-50 shadow-sm">
+        <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(#c7d2fe_1px,transparent_1px),linear-gradient(90deg,#c7d2fe_1px,transparent_1px)] [background-size:34px_34px]" />
+        <div className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full border border-indigo-200" />
+        <div className="absolute right-5 top-5 rounded-2xl bg-white px-3 py-2 text-xs font-bold text-indigo-700 shadow-sm">
+          {rides.length} live routes
+        </div>
+        <div className="absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl bg-indigo-600 text-sm font-bold text-white shadow-lg">
+          {selectedCollege.shortName}
+        </div>
+        {rides.map((ride, index) => (
+          <button
+            key={ride.id}
+            onClick={() => setSelected(ride.id)}
+            className={`absolute flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold shadow-md ${
+              selectedRide?.id === ride.id ? "bg-slate-950 text-white" : "bg-white text-indigo-700"
+            }`}
+            style={{
+              left: `${16 + (index % 3) * 28}%`,
+              top: `${22 + index * 10}%`,
+            }}
+          >
+            {ride.driverName[0]}
+          </button>
+        ))}
+      </section>
 
       {selectedRide && (
-        <div className="glass-panel absolute bottom-0 left-0 right-0 z-20 rounded-t-[34px] p-4">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-lg font-black text-black">
-                {selectedRide.driverName[0]}
-              </div>
-              <div>
-                <p className="font-semibold text-white">{selectedRide.driverName}</p>
-                <p className="text-xs text-white/45">
-                  {selectedRide.from} to {selectedRide.to}
-                </p>
-              </div>
+        <section className="rounded-3xl bg-white p-4 shadow-sm">
+          <div className="mb-3 flex items-start justify-between">
+            <div>
+              <p className="font-bold text-slate-950">{selectedRide.driverName}</p>
+              <p className="text-sm text-slate-500">{selectedRide.from} to {selectedRide.to}</p>
             </div>
-            <button onClick={() => setSelected(null)} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.08]">
-              <X size={16} />
-            </button>
+            <p className="font-bold text-indigo-700">Rs {selectedRide.fuelShare}</p>
           </div>
-
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 text-xs text-slate-600">
             <Pill icon={<Clock size={13} />} text={selectedRide.departureTime} />
             <Pill icon={<Users size={13} />} text={`${selectedRide.availableSeats} seats`} />
             <Pill icon={selectedRide.vehicleType === "car" ? <Car size={13} /> : <Bike size={13} />} text={selectedRide.vehicleType} />
           </div>
-
-          <button onClick={() => router.push("/find")} className="mt-4 w-full rounded-full bg-white py-4 font-bold text-black">
-            Join for Rs {selectedRide.fuelShare}
+          <button onClick={() => router.push("/find")} className="mt-4 w-full rounded-2xl bg-indigo-600 py-3 font-bold text-white">
+            View ride
           </button>
-        </div>
+        </section>
       )}
+
+      <section className="rounded-3xl bg-white p-4 shadow-sm">
+        <h2 className="mb-3 font-bold text-slate-950">All routes</h2>
+        <div className="space-y-3">
+          {rides.map((ride) => (
+            <button key={ride.id} onClick={() => setSelected(ride.id)} className="flex w-full items-center gap-3 text-left">
+              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700">
+                <MapPin size={15} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold text-slate-900">{ride.from}</span>
+                <span className="block text-xs text-slate-500">{ride.departureTime} / {ride.availableSeats} seats</span>
+              </span>
+              <span className="text-sm font-bold text-indigo-700">Rs {ride.fuelShare}</span>
+            </button>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
 function Pill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex items-center justify-center gap-1 rounded-full bg-white/[0.07] px-2 py-3 text-xs font-semibold capitalize text-white/65">
+    <span className="flex items-center justify-center gap-1 rounded-full bg-slate-100 px-2 py-2 capitalize">
       {icon}
       {text}
-    </div>
+    </span>
   );
 }

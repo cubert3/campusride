@@ -14,16 +14,16 @@ const tabs = [
 export default function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-md border-t border-white/10 bg-black/90 backdrop-blur-xl">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-md border-t border-slate-200 bg-white/95 backdrop-blur">
       <div className="flex px-1">
         {tabs.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
           return (
             <Link key={href} href={href} className="flex flex-1 flex-col items-center gap-1 py-3">
-              <span className={`rounded-2xl px-3 py-1 ${active ? "bg-white text-black" : "text-white/45"}`}>
+              <span className={`rounded-2xl px-3 py-1 ${active ? "bg-indigo-600 text-white" : "text-slate-400"}`}>
                 <Icon size={18} />
               </span>
-              <span className={`text-[11px] ${active ? "font-bold text-white" : "text-white/45"}`}>
+              <span className={`text-[11px] ${active ? "font-bold text-indigo-700" : "text-slate-400"}`}>
                 {label}
               </span>
             </Link>

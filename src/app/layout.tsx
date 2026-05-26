@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
+  themeColor: "#f8fafc",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -20,9 +20,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-black font-sans" suppressHydrationWarning>
+      <body className="min-h-screen bg-slate-100 font-sans" suppressHydrationWarning>
         <AppProvider>
-          <main className="phone-surface mx-auto min-h-screen max-w-md overflow-hidden pb-20 text-white shadow-2xl">
+          <main className="mx-auto min-h-screen max-w-md bg-slate-50 pb-20 text-slate-950 shadow-xl">
             {children}
           </main>
           <BottomNav />

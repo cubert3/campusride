@@ -2,27 +2,26 @@
 
 import { useApp } from "@/context/AppContext";
 import { Ride } from "@/types";
+import { Bike, Car, CheckCircle, Clock, MapPin, Plus, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Bike, Car, CheckCircle, Clock, MapPin, Plus, ShieldCheck, Users } from "lucide-react";
 
 const pickupOptions = [
-  { name: "Koramangala", lat: 12.9352, lng: 77.6245, share: 40 },
-  { name: "HSR Layout", lat: 12.9116, lng: 77.6389, share: 35 },
-  { name: "Jayanagar", lat: 12.9308, lng: 77.5838, share: 45 },
-  { name: "BTM Layout", lat: 12.9166, lng: 77.6101, share: 30 },
+  { name: "Marathahalli", lat: 12.9569, lng: 77.7011, share: 25 },
+  { name: "Koramangala", lat: 12.9352, lng: 77.6245, share: 45 },
+  { name: "HSR Layout", lat: 12.9116, lng: 77.6389, share: 40 },
+  { name: "Whitefield", lat: 12.9698, lng: 77.7500, share: 35 },
 ];
 
 export default function OfferPage() {
-  const { user, addRide } = useApp();
+  const { user, addRide, selectedCollege } = useApp();
   const router = useRouter();
   const [from, setFrom] = useState(pickupOptions[0]);
-  const [time, setTime] = useState("08:20 AM");
+  const [time, setTime] = useState("08:30 AM");
   const [vehicleType, setVehicleType] = useState<"car" | "bike">("car");
   const [seats, setSeats] = useState(2);
   const [created, setCreated] = useState(false);
-
-  const suggestedShare = vehicleType === "bike" ? Math.max(25, from.share - 10) : from.share;
+  const suggestedShare = vehicleType === "bike" ? Math.max(20, from.share - 10) : from.share;
 
   function createRide() {
     const ride: Ride = {
@@ -33,9 +32,9 @@ export default function OfferPage() {
       from: from.name,
       fromLat: from.lat,
       fromLng: from.lng,
-      to: "RV College",
-      toLat: 12.9231,
-      toLng: 77.4987,
+      to: selectedCollege.shortName,
+      toLat: selectedCollege.lat,
+      toLng: selectedCollege.lng,
       departureTime: time,
       totalSeats: seats,
       availableSeats: seats,
@@ -50,18 +49,12 @@ export default function OfferPage() {
 
   if (created) {
     return (
-      <div className="map-grid flex min-h-screen items-end p-4">
-        <div className="glass-panel w-full rounded-[34px] p-5 text-center">
-          <CheckCircle size={60} className="mx-auto mb-4 text-emerald-300" />
-          <h1 className="text-3xl font-semibold tracking-tight">Ride is live</h1>
-          <p className="mt-2 text-sm text-white/50">Students can now join your commute and pay directly by UPI.</p>
-          <div className="my-6 rounded-[28px] bg-white/[0.06] p-4 text-left">
-            <p className="font-semibold text-white">{from.name} to RV College</p>
-            <p className="mt-1 text-sm text-white/45">
-              {time} / {seats} seats / Rs {suggestedShare}
-            </p>
-          </div>
-          <button onClick={() => router.push("/home")} className="w-full rounded-full bg-white py-4 font-bold text-black">
+      <div className="flex min-h-screen items-center p-4">
+        <div className="w-full rounded-3xl bg-white p-6 text-center shadow-sm">
+          <CheckCircle size={56} className="mx-auto mb-4 text-emerald-600" />
+          <h1 className="text-2xl font-bold text-slate-950">Ride published</h1>
+          <p className="mt-2 text-sm text-slate-500">Your commute is now visible to students going to {selectedCollege.shortName}.</p>
+          <button onClick={() => router.push("/home")} className="mt-6 w-full rounded-2xl bg-indigo-600 py-3 font-bold text-white">
             Done
           </button>
         </div>
@@ -70,98 +63,78 @@ export default function OfferPage() {
   }
 
   return (
-    <div className="min-h-screen p-4">
-      <header className="pt-2">
-        <p className="text-sm text-white/45">Driver mode</p>
-        <h1 className="text-3xl font-semibold tracking-tight">Offer your commute</h1>
+    <div className="space-y-4 p-4">
+      <header>
+        <p className="text-sm text-slate-500">Offer ride to</p>
+        <h1 className="text-2xl font-bold text-slate-950">{selectedCollege.shortName}</h1>
+        <p className="text-sm text-slate-500">Share your daily commute with verified students.</p>
       </header>
 
-      <section className="relative mt-5 overflow-hidden rounded-[34px] bg-[#111] p-5">
-        <p className="absolute -left-1 top-8 text-7xl font-black tracking-tight text-white/[0.04]">Drive</p>
-        <div className="relative z-10">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-300">No platform fee</div>
-            <ShieldCheck size={18} className="text-white/60" />
-          </div>
-          <div className="h-28 w-full car-sedan" />
-          <p className="mt-3 max-w-xs text-lg font-semibold text-white">Publish a verified student-only ride in under a minute.</p>
+      <section className="rounded-3xl bg-white p-4 shadow-sm">
+        <FormLabel icon={<MapPin size={15} />} label="Pickup area" />
+        <div className="grid grid-cols-2 gap-2">
+          {pickupOptions.map((option) => (
+            <button
+              key={option.name}
+              onClick={() => setFrom(option)}
+              className={`rounded-2xl border px-3 py-3 text-left text-sm font-bold ${
+                from.name === option.name ? "border-indigo-600 bg-indigo-50 text-indigo-700" : "border-slate-200 text-slate-700"
+              }`}
+            >
+              {option.name}
+            </button>
+          ))}
         </div>
       </section>
 
-      <section className="mt-4 space-y-4">
-        <Block label="Pickup area" icon={<MapPin size={15} />}>
+      <section className="grid grid-cols-2 gap-3">
+        <div className="rounded-3xl bg-white p-4 shadow-sm">
+          <FormLabel icon={<Car size={15} />} label="Vehicle" />
           <div className="grid grid-cols-2 gap-2">
-            {pickupOptions.map((option) => (
-              <button
-                key={option.name}
-                onClick={() => setFrom(option)}
-                className={`rounded-[22px] border px-3 py-3 text-left text-sm font-bold ${
-                  from.name === option.name ? "border-white bg-white text-black" : "border-white/10 bg-white/[0.05] text-white"
-                }`}
-              >
-                {option.name}
-              </button>
-            ))}
+            {(["car", "bike"] as const).map((type) => {
+              const Icon = type === "car" ? Car : Bike;
+              return (
+                <button
+                  key={type}
+                  onClick={() => {
+                    setVehicleType(type);
+                    setSeats(type === "bike" ? 1 : 2);
+                  }}
+                  className={`flex items-center justify-center gap-1 rounded-xl py-3 text-sm font-bold capitalize ${
+                    vehicleType === type ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-600"
+                  }`}
+                >
+                  <Icon size={15} />
+                  {type}
+                </button>
+              );
+            })}
           </div>
-        </Block>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Block label="Vehicle" icon={<Car size={15} />}>
-            <div className="grid grid-cols-2 gap-2">
-              {(["car", "bike"] as const).map((type) => {
-                const Icon = type === "car" ? Car : Bike;
-                return (
-                  <button
-                    key={type}
-                    onClick={() => {
-                      setVehicleType(type);
-                      setSeats(type === "bike" ? 1 : 2);
-                    }}
-                    className={`flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold capitalize ${
-                      vehicleType === type ? "bg-white text-black" : "bg-white/[0.07] text-white/55"
-                    }`}
-                  >
-                    <Icon size={16} />
-                    {type}
-                  </button>
-                );
-              })}
-            </div>
-          </Block>
-
-          <Block label="Seats" icon={<Users size={15} />}>
-            <div className="flex items-center justify-between rounded-full bg-white/[0.07] px-2 py-2">
-              <button onClick={() => setSeats(Math.max(1, seats - 1))} className="h-9 w-9 rounded-full bg-black font-black text-white">
-                -
-              </button>
-              <span className="font-black text-white">{seats}</span>
-              <button
-                onClick={() => setSeats(Math.min(vehicleType === "bike" ? 1 : 4, seats + 1))}
-                className="h-9 w-9 rounded-full bg-black font-black text-white"
-              >
-                +
-              </button>
-            </div>
-          </Block>
         </div>
-
-        <Block label="Departure time" icon={<Clock size={15} />}>
-          <input
-            value={time}
-            onChange={(event) => setTime(event.target.value)}
-            className="w-full rounded-full border border-white/10 bg-white/[0.07] px-4 py-4 text-sm font-bold text-white outline-none"
-          />
-        </Block>
+        <div className="rounded-3xl bg-white p-4 shadow-sm">
+          <FormLabel icon={<Users size={15} />} label="Seats" />
+          <div className="flex items-center justify-between rounded-2xl bg-slate-100 px-2 py-2">
+            <button onClick={() => setSeats(Math.max(1, seats - 1))} className="h-9 w-9 rounded-xl bg-white font-bold">-</button>
+            <span className="font-bold">{seats}</span>
+            <button onClick={() => setSeats(Math.min(vehicleType === "bike" ? 1 : 4, seats + 1))} className="h-9 w-9 rounded-xl bg-white font-bold">+</button>
+          </div>
+        </div>
       </section>
 
-      <section className="glass-panel mt-4 rounded-[30px] p-4">
-        <p className="text-sm text-white/45">Suggested fuel share</p>
+      <section className="rounded-3xl bg-white p-4 shadow-sm">
+        <FormLabel icon={<Clock size={15} />} label="Departure time" />
+        <input
+          value={time}
+          onChange={(event) => setTime(event.target.value)}
+          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold outline-none focus:border-indigo-500"
+        />
+      </section>
+
+      <section className="rounded-3xl bg-emerald-50 p-4">
+        <p className="text-sm text-emerald-700">Suggested fuel share</p>
         <div className="mt-1 flex items-end justify-between">
-          <div>
-            <p className="text-5xl font-semibold tracking-tight">Rs {suggestedShare}</p>
-            <p className="mt-1 text-xs text-white/40">Fair split based on distance</p>
-          </div>
-          <button onClick={createRide} className="flex items-center gap-2 rounded-full bg-white px-5 py-4 text-sm font-bold text-black">
+          <p className="text-4xl font-black text-slate-950">Rs {suggestedShare}</p>
+          <button onClick={createRide} className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 font-bold text-white">
             <Plus size={17} />
             Publish
           </button>
@@ -171,14 +144,11 @@ export default function OfferPage() {
   );
 }
 
-function Block({ label, icon, children }: { label: string; icon: React.ReactNode; children: React.ReactNode }) {
+function FormLabel({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <div className="glass-panel rounded-[28px] p-4">
-      <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-white/40">
-        {icon}
-        {label}
-      </p>
-      {children}
-    </div>
+    <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+      {icon}
+      {label}
+    </p>
   );
 }

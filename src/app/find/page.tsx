@@ -3,10 +3,10 @@
 import { useApp } from "@/context/AppContext";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Bike, Car, CheckCircle, Clock, MapPin, ShieldCheck, Star, Users } from "lucide-react";
+import { Bike, Car, CheckCircle, Clock, ShieldCheck, Star, Users } from "lucide-react";
 
 export default function FindPage() {
-  const { rides, joinRide } = useApp();
+  const { rides, joinRide, selectedCollege } = useApp();
   const router = useRouter();
   const [joined, setJoined] = useState<string | null>(null);
   const [otp, setOtp] = useState("");
@@ -18,8 +18,7 @@ export default function FindPage() {
   );
 
   function handleJoin(rideId: string) {
-    const generatedOtp = joinRide(rideId);
-    setOtp(generatedOtp);
+    setOtp(joinRide(rideId));
     setJoined(rideId);
   }
 
@@ -27,22 +26,22 @@ export default function FindPage() {
 
   if (joined && joinedRide) {
     return (
-      <div className="map-grid flex min-h-screen items-end p-4">
-        <div className="glass-panel w-full rounded-[34px] p-5 text-center">
-          <CheckCircle size={60} className="mx-auto mb-4 text-emerald-300" />
-          <h2 className="text-3xl font-semibold tracking-tight">Ride joined</h2>
-          <p className="mt-2 text-sm text-white/50">Show this code to {joinedRide.driverName} before the ride starts.</p>
-          <div className="my-6 rounded-[28px] border border-white/10 bg-white/[0.06] p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/35">Start OTP</p>
-            <p className="mt-2 text-6xl font-black tracking-[0.2em] text-white">{otp}</p>
+      <div className="flex min-h-screen items-center p-4">
+        <div className="w-full rounded-3xl bg-white p-6 text-center shadow-sm">
+          <CheckCircle size={56} className="mx-auto mb-4 text-emerald-600" />
+          <h1 className="text-2xl font-bold text-slate-950">Ride joined</h1>
+          <p className="mt-2 text-sm text-slate-500">Show this OTP to {joinedRide.driverName} to start the ride.</p>
+          <div className="my-6 rounded-3xl bg-indigo-50 p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Start OTP</p>
+            <p className="mt-2 text-5xl font-black tracking-[0.18em] text-indigo-700">{otp}</p>
           </div>
           <button
             onClick={() => router.push(`/payment?amount=${joinedRide.fuelShare}&driver=${encodeURIComponent(joinedRide.driverName)}`)}
-            className="mb-3 w-full rounded-full bg-white py-4 font-bold text-black"
+            className="mb-3 w-full rounded-2xl bg-indigo-600 py-3 font-bold text-white"
           >
-            Pay Rs {joinedRide.fuelShare} by UPI
+            Pay Rs {joinedRide.fuelShare} via UPI
           </button>
-          <button onClick={() => setJoined(null)} className="w-full rounded-full bg-white/10 py-4 font-bold text-white">
+          <button onClick={() => setJoined(null)} className="w-full rounded-2xl bg-slate-100 py-3 font-bold text-slate-700">
             Back to rides
           </button>
         </div>
@@ -51,82 +50,62 @@ export default function FindPage() {
   }
 
   return (
-    <div className="min-h-screen p-4">
-      <header className="flex items-center justify-between pt-2">
-        <div>
-          <p className="text-sm text-white/45">Ride options</p>
-          <h1 className="text-3xl font-semibold tracking-tight">To RV College</h1>
-        </div>
-        <div className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-300">
-          {availableRides.length} live
-        </div>
+    <div className="space-y-4 p-4">
+      <header>
+        <p className="text-sm text-slate-500">Find rides to</p>
+        <h1 className="text-2xl font-bold text-slate-950">{selectedCollege.shortName}</h1>
+        <p className="text-sm text-slate-500">{availableRides.length} verified rides available</p>
       </header>
 
-      <section className="relative mt-5 overflow-hidden rounded-[32px] bg-[#101010] p-4">
-        <p className="absolute left-4 top-6 text-6xl font-black tracking-tight text-white/[0.04]">Campus</p>
-        <div className="relative z-10">
-          <div className="mb-4 h-24 w-full car-suv" />
-          <RouteLine from="Your area" to="RV College of Engineering" />
-        </div>
-      </section>
-
-      <div className="mt-4 grid grid-cols-3 gap-2 rounded-full bg-white/[0.06] p-1">
+      <div className="grid grid-cols-3 gap-2 rounded-2xl bg-slate-200 p-1">
         {(["all", "car", "bike"] as const).map((option) => (
           <button
             key={option}
             onClick={() => setFilter(option)}
-            className={`rounded-full py-2 text-sm font-bold capitalize ${
-              filter === option ? "bg-white text-black" : "text-white/45"
-            }`}
+            className={`rounded-xl py-2 text-sm font-bold capitalize ${filter === option ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"}`}
           >
             {option}
           </button>
         ))}
       </div>
 
-      <div className="mt-4 space-y-3">
-        {availableRides.map((ride, index) => {
+      <div className="space-y-3">
+        {availableRides.map((ride) => {
           const Vehicle = ride.vehicleType === "car" ? Car : Bike;
           return (
-            <article key={ride.id} className="glass-panel overflow-hidden rounded-[30px] p-4">
-              <div className="mb-4 flex items-start justify-between">
+            <article key={ride.id} className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-lg font-black text-black">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-100 font-bold text-indigo-700">
                     {ride.driverName[0]}
                   </div>
                   <div>
-                    <p className="font-semibold text-white">{ride.driverName}</p>
-                    <p className="mt-1 flex items-center gap-1 text-xs text-white/45">
-                      <Star size={12} className="fill-amber-300 text-amber-300" />
+                    <p className="font-bold text-slate-950">{ride.driverName}</p>
+                    <p className="flex items-center gap-1 text-xs text-slate-500">
+                      <Star size={12} className="fill-amber-400 text-amber-400" />
                       {ride.driverRating}
-                      <span className="mx-1">/</span>
-                      <ShieldCheck size={12} className="text-emerald-300" />
+                      <span>/</span>
+                      <ShieldCheck size={12} className="text-emerald-600" />
                       verified
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xl font-semibold text-white">Rs {ride.fuelShare}</p>
-                  <p className="text-xs text-white/40">fuel share</p>
-                </div>
+                <p className="font-bold text-indigo-700">Rs {ride.fuelShare}</p>
               </div>
 
-              <div className="grid grid-cols-[18px_1fr] gap-x-3 gap-y-2 rounded-[24px] bg-white/[0.05] p-4">
-                <span className="mt-1 h-3 w-3 rounded-full border-4 border-white bg-black" />
-                <p className="text-sm font-semibold text-white">{ride.from}</p>
-                <span className="route-line ml-[5px] h-7 w-0.5" />
-                <p className="text-xs text-white/35">Matched route #{index + 1}</p>
-                <span className="mt-1 h-3 w-3 rounded-full bg-red-500" />
-                <p className="text-sm font-semibold text-white">{ride.to}</p>
+              <div className="rounded-2xl bg-slate-50 p-3">
+                <p className="font-semibold text-slate-900">{ride.from}</p>
+                <p className="my-1 text-xs text-slate-400">to</p>
+                <p className="font-semibold text-slate-900">{ride.to}</p>
               </div>
 
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <div className="flex gap-2 text-xs text-white/55">
+              <div className="mt-3 flex items-center justify-between gap-3">
+                <div className="flex gap-2 text-xs text-slate-500">
                   <Pill icon={<Clock size={13} />} text={ride.departureTime} />
-                  <Pill icon={<Users size={13} />} text={`${ride.availableSeats}`} />
+                  <Pill icon={<Users size={13} />} text={`${ride.availableSeats} seats`} />
                   <Pill icon={<Vehicle size={13} />} text={ride.vehicleType} />
                 </div>
-                <button onClick={() => handleJoin(ride.id)} className="rounded-full bg-white px-5 py-3 text-sm font-bold text-black">
+                <button onClick={() => handleJoin(ride.id)} className="rounded-2xl bg-slate-950 px-5 py-2.5 text-sm font-bold text-white">
                   Join
                 </button>
               </div>
@@ -138,27 +117,9 @@ export default function FindPage() {
   );
 }
 
-function RouteLine({ from, to }: { from: string; to: string }) {
-  return (
-    <div className="space-y-2 rounded-[26px] border border-white/10 bg-black/55 p-4">
-      <div className="flex items-center gap-3">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black">
-          <MapPin size={15} />
-        </span>
-        <span className="text-sm font-semibold text-white">{from}</span>
-      </div>
-      <div className="ml-4 h-7 w-px bg-white/15" />
-      <div className="flex items-center gap-3">
-        <span className="h-8 w-8 rounded-full bg-red-500" />
-        <span className="text-sm font-semibold text-white">{to}</span>
-      </div>
-    </div>
-  );
-}
-
 function Pill({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <span className="flex items-center gap-1 rounded-full bg-white/[0.07] px-3 py-2 capitalize">
+    <span className="flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 capitalize">
       {icon}
       {text}
     </span>
